@@ -180,7 +180,8 @@
                           url: item.url,
                           target: item.target,
                           linkType: item.linkType,
-                          children: this.getMenuItems(item.children)
+                          children: this.getMenuItems(item.children),
+                          params: item.class ? JSON.parse(item.class) : {},
                        }
                ))
 

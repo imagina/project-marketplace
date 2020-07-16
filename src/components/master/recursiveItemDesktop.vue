@@ -123,6 +123,7 @@
       },
       //Redirect to route of pages
       redirectTo(item) {
+        console.log(item)
         if (item.linkType && (item.linkType == 'external')) {
           if(process.env.CLIENT)  window.open(`https://${item.url}`, item.target)
         } else {
