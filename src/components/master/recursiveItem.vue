@@ -70,7 +70,7 @@
         let response = true
         if (!item.activated) response = false
         if (item.children) response = false
-        if (!item.name) response = false
+        //if (!item.name) response = false
         if (item.permission && !this.$auth.hasAccess(item.permission)) response = false
         return response//Response
       },
@@ -95,7 +95,7 @@
         if (item.linkType && (item.linkType == 'external')) {
           if(process.env.CLIENT)  window.open(`https://${item.url}`, item.target)
         } else {
-          this.$router.push({name: item.name, params: item.params || {}})
+          this.$router.push({name: item.name || item.uri, params: item.params || {}})
         }
       },
       //Validate if children of multi-item is selected

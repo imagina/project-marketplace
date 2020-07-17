@@ -55,7 +55,8 @@
             <!--= Menu Desktop =-->
             <div class="row justify-center full-width" id="bg-menu">
                <div class="col-11">
-                  <menu-list class="menu" :menu="items" in-line/>
+                  <menu-list-desktop :menu="items" class="menu" />
+                  <!--<menu-list class="menu" :menu="items" in-line/>-->
                </div>
             </div>
 
@@ -98,6 +99,7 @@
 </template>
 <script>
    import menuList from "../recursiveItem";
+   import menuListDesktop from "../recursiveItemDesktop";
    import imSocial from 'src/components/master/imSocial';
    import widgetUser from "src/components/quser/widget-user";
    import searchStore from 'src/components/master/searchStore'
@@ -107,6 +109,7 @@
       props: {},
       components: {
          menuList,
+         menuListDesktop,
          imSocial,
          widgetUser,
          searchStore,
@@ -131,53 +134,7 @@
             },
             canCreateStore: false,
             phones: [],//this.$store.getters['qsiteSettings/getSettingValueByName']('isite::phones')
-            items: [
-               {
-                  icon: 'fas fa-bars',
-                  title: 'app.layout.menu.categories',
-                  activated: true,
-                  name: '#',
-                  children: null
-               },
-               {
-                  icon: 'fas fa-store',
-                  title: 'app.layout.page.storesOnOffer',
-                  name: 'app.ofertas',
-                  activated: true
-               },
-               {
-                  icon: 'fas fa-car-side',
-                  title: 'app.layout.menu.domicilios',
-                  name: 'stores.index',
-                  params: {slug: 'agencias-de-envos'},
-                  activated: true
-               },
-               {
-                  icon: 'far fa-surprise',
-                  title: 'app.layout.page.problems',
-                  name: 'app.problems',
-                  activated: true
-               },
-               {
-                  icon: 'far fa-newspaper',
-                  title: 'app.layout.menu.blog',
-                  name: 'qblog.index',
-                  params: {category: 'blog'},
-                  activated: true
-               },
-               {
-                  icon: 'fas fa-users',
-                  title: 'app.layout.page.about',
-                  name: 'app.nosotros',
-                  activated: true
-               },
-               {
-                  icon: 'far fa-envelope-open',
-                  title: 'app.layout.page.contact',
-                  name: 'app.contacto',
-                  activated: true
-               }
-            ],
+            items: [],
             loading:false,
             notifications:0
          }
@@ -191,16 +148,44 @@
          },
          storeSelect(){
             return this.$store.state.qmarketplaceStores.storeSelected
-         }
+         },
+         //Return meno from backend
+         menuItems() {
+            let menu = this.$array.builTree(this.$store.state.qcrudMaster.show['qmenu-menus-main'].data.menuitems)
+            return this.getMenuItems(menu)
+         },
       },
       methods: {
          async init() {
             this.loading = true
             await this.$store.dispatch('qmarketplaceStores/GET_USER_STORES')
             await this.$store.dispatch('qmarketplaceStores/SET_STORE')
+            this.items = this.menuItems
             await this.getCategoryStore();
             await this.getSuscriptionData();
             this.loading = false;
+         },
+         getMenuItems(menu){
+            //Transform data
+            if (menu) {
+
+               return menu.map(item =>(
+                       {
+                          permission: null,
+                          activated: true,
+                          name: item.pageName,
+                          title: item.title,
+                          icon: item.icon,
+                          uri: item.uri,
+                          url: item.url,
+                          target: item.target,
+                          linkType: item.linkType,
+                          children: this.getMenuItems(item.children),
+                          params: item.class ? JSON.parse(item.class) : {},
+                       }
+               ))
+
+            }
          },
          getCategoryStore() {
             //Transform data
@@ -239,8 +224,11 @@
                      })
 
                   })
-                  this.items[0].children = this.$clone(child);
-
+                  for(let x in this.items){
+                     if(this.items[x].uri === 'app.categories'){
+                        this.items[x].children = this.$clone(child);
+                     }
+                  }
                }
             });
          },
@@ -307,103 +295,58 @@
    }
 </script>
 <style lang="stylus">
-   #masterHeader
-      .header-desktop
-         #listMenu
+   .menu-down
+      #listMenu
+         width 347px
+         transform: skew(0deg) !important;
+         background-color $grey-3
+         .content-item
+            padding 0
+            transform: none !important;
+            font-family 'Trebuchet MS'
+            height 69px
+            display block
+            border-bottom 2px solid $grey-5
             .q-item
+               padding-left 45px
+               height 100%
+               cursor pointer
+               color $secondary
+               font-size: 1.1rem;
+            .q-icon
+               color $tertiary
+               font-size 27px !important
+   .menu-left
+      #listMenu
+         padding-top 18px
+         padding-bottom 18px
+         transform: skew(0deg) !important
+         background-color $tertiary
+         z-index 10000
+         display block
+         width 374px
+
+         .content-item
+            color #fff
+            border-bottom none
+            height 40px
+            display block
+            .q-item
+               padding-left 45px
+               height 100%
+               text-shadow none
                background-color transparent
-            .q-expansion-item__container
-               .q-expansion-item__content
-                  padding 0 0 0 15px
+               cursor pointer
+               font-size: 1.1rem;
+               color #fff!important
+               .q-item__section--main
+                  color #fff!important
+            .q-icon
+               min-width 20px
+               padding-right 10px
 
-               .q-expansion-item__toggle-icon
-                  display none
 
-            .content-item
-               transform: none !important;
-               border none
-
-               .q-expansion-item__content
-                  position absolute
-
-               #listMenu
-                  position absolute
-                  width 347px
-                  transform: skew(0deg) !important;
-                  left 0px
-                  top 10px
-                  background-color $grey-3
-
-                  .q-expansion-item__container
-                     .q-expansion-item__toggle-icon
-                        display block
-
-                  .content-item
-                     padding 0
-                     transform: none !important;
-                     font-family Trebuchet MS
-                     height 69px
-                     display block
-                     border-bottom 2px solid $grey-5
-
-                     .q-expansion-item
-                        height 100%
-
-                        .q-expansion-item__container
-                           height 100%
-
-                     .q-item
-                        padding-left 45px
-                        height 100%
-
-                        .q-icon
-                           color $tertiary
-                           font-size 27px !important
-
-                     #listMenu
-                        padding-top 18px
-                        padding-bottom 18px
-                        transform: skew(0deg) !important
-                        background-color $tertiary
-                        position absolute
-                        left 347px
-                        top -67 px
-                        z-index 10000
-                        display block
-
-                        .content-item
-                           color #fff
-                           border-bottom none
-                           height 40px
-                           display block
-
-                           .q-expansion-item
-                              height 100%
-
-                              .q-expansion-item__container
-                                 height 100%
-
-                           .q-item
-                              height 100%
-                              color #fff
-                              text-shadow none
-
-                     .q-separator
-                        display none
-
-                     .q-item
-                        background-color transparent
-                        cursor pointer
-                        color $secondary
-                        font-size: 1.1rem;
-
-                        .q-item__section--avatar
-                           min-width 20px
-                           padding-right 10px
-
-                        .q-icon
-                           font-size 16px
-
+   #masterHeader
       .header-movil
          .logo
             background-size 100% 100%
@@ -560,7 +503,7 @@
                   -ms-flex 1 1 auto
                   flex 1 1 auto
 
-                  > .q-expansion-item, > .q-item
+                  > .q-menu > .q-item
                      cursor pointer
                      position relative
                      color $secondary
