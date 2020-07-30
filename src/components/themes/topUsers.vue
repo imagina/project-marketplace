@@ -7,7 +7,7 @@
       <div class="text-h6 destc-text font-family-secondary">Usuarios Destacados</div>
       <div v-if="listUsers.length>0">
         <ul>
-        <li v-for="item of listUsers" :key="item.userId" @click="openModalUser(item.user)" clickable>{{item.user.fullName}}</li>
+        <li v-for="item of listUsers" :key="item.userId" @click="openModalUser(item.user)" clickable><i class="fas fa-star"></i> {{item.user.fullName}}</li>
         </ul>
       </div>
       <div v-else>
@@ -124,11 +124,9 @@
             border-radius 10px
             display flex
             cursor pointer
-            &:before
+            .fas
               margin-right 6px
-              content '\f005'
               color $warning
-              font-family 'fontawesome'
             &:hover
               background rgba(255 255 255 0.5)
   @m

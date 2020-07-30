@@ -2,7 +2,6 @@
    <q-page class="bg-fondo advanced_search form-general relative-position" v-if="success">
       <!-- Busqueda Avanzada -->
       <div class="q-pa-md bg-white shadow-2 advanced-search-block">
-	      
          <div class="q-container q-pt-lg">
             <!-- Titulo -->
             <div class="row q-mb-lg">
@@ -21,7 +20,6 @@
             </div>
 
             <transition name="fade">
-	            
                <div v-if="drawerPoint">
 
                   <div class="row q-col-gutter-lg">
@@ -40,7 +38,6 @@
                            />
                         </div>
                      </div>
-	                  
                      <div class="col-xs-12 col-sm-6 ">
                         <div class="q-mb-lg">
                            <p class="caption q-mb-xs">Ingrese el texto</p>
@@ -71,7 +68,6 @@
                                    label="Selecione Ciudad"/>
                         </div>
                      </div>
-	                  
                      <div class="col-xs-12 col-sm-6">
                         <div class="q-mb-lg">
                            <p class="caption q-mb-xs">Barrio</p>
@@ -95,7 +91,8 @@
                         <q-toggle dense v-model="advancedSearch.offer" color="primary" label="Tienda en Oferta"/>
 
                      </div>
-	                  
+
+
                   </div>
 
                   <div class="col-12 text-right">
@@ -114,8 +111,6 @@
 
          </div>
       </div>
-
-      <!-- Results Stores -->
       <div v-if="success">
          <div v-if="stores.length>0">
             <div  class="row q-pa-lg">
@@ -123,33 +118,46 @@
                   <store :store="store"></store>
                </div>
             </div>
-	         
-                      <div class="q-container">
-               <div
-                       class="row flex flex-center q-px-xl"
-                       v-if="paginate.maxPages > 1">
-                  <div class="col-md-6" v-if="$q.platform.is.desktop">
-	
-	                  <q-btn class="full-width" rounded color="primary" @click="getMore" v-if="!(paginate.page >= paginate.maxPages)">
-		                  Cargar más
-	                  </q-btn>
-	                  
+            <infinite-loading
+                    class="q-pt-md"
+                    :identifier="infiniteId"
+                    v-if="showInfiniteLoading"
+                    spinner="waveDots"
+                    @infinite="searchStores">
+               <div slot="no-more">
+                  <div class="row q-pa-lg">
+                     <div class="col-12">
+                        <q-banner inline-actions class="q-mt-xl text-white bg-red">
+                           <template v-slot:avatar>
+                              <q-icon name="warning" color="white"/>
+                           </template>
+                           No hay mas resultados disponibles
+                        </q-banner>
+
+                     </div>
                   </div>
-	               
-	               <div v-else class="col-md-12 full-width q-px-xl">
-		
-		               <q-btn  class="full-width q-mx-xl" rounded color="primary" @click="getMore" v-if="!(paginate.page >= paginate.maxPages)">
-			               Cargar más
-		               </q-btn>
-		              
-	               </div>
-	               
                </div>
-            </div>
+               <div slot="no-results">
+                  <div class="row q-pa-lg">
+                     <div class="col-12">
+                        <q-banner inline-actions class="q-mt-xl text-white bg-orange">
+                           <template v-slot:avatar>
+                              <q-icon name="warning" color="white"/>
+                           </template>
+                           No resultados disponibles
+                        </q-banner>
+
+                     </div>
+                  </div>
+               </div>
+               <div slot="error">
+                  Error
+               </div>
+            </infinite-loading>
 
          </div>
 
-         <div v-else="success">
+         <div v-else>
 
             <div class="row q-pa-lg">
                <div class="col-12">
@@ -177,15 +185,30 @@
 <script>
    import store from 'src/components/themes/store'
    import qbanner from '@imagina/qbanner/_components/frontend/qbanner'
-
+   import InfiniteLoading from 'vue-infinite-loading'
    export default {
       name: 'PageBusqueda',
       components: {
          store,
-         qbanner
+         qbanner,
+         InfiniteLoading
+      },
+      meta() {
+         let routetitle = this.$route.params.slug || 'Busqueda Avanzada'
+         let siteName = this.$store.getters['qsiteSettings/getSettingValueByName']('core::site-name')
+         let siteDescription = "Busqueda avanzada de empresas"
+         let iconHref = this.$store.getters['qsiteSettings/getSettingMediaByName']('isite::favicon').path
+         //Set category data
+         return {
+            title: `${routetitle.charAt(0).toUpperCase() + routetitle.slice(1)} | ${siteName}`,
+            meta: {
+               description: {name: 'description', content: (siteDescription || siteName)},
+            },
+         }
       },
       data() {
          return {
+            showInfiniteLoading: false,
             advancedSearch: {
                category: '',
                city: '',
@@ -194,12 +217,6 @@
                company: [],
                level: '',
                offer: false
-            },
-            paginate: {
-               page: 1,
-               take: 12,
-               minPages: 1,
-               maxPages: 0
             },
             categoryOptions: [],
             cityOptions: [],
@@ -219,7 +236,17 @@
                   value: '3'
                }
             ],
+            infiniteId: +new Date(),
+            visible: false,
+            page: 1,
+            loadingScroll: true,
+            items: [],
             stores: [],
+            totalPage: 0,
+            take: 16,
+            lastPage: 1,
+
+
             loading: true,
             success: false,
             typeSearch: 1, // 1 = Front Header, 2 = Advance Search
@@ -250,7 +277,11 @@
          }
       },
       mounted() {
-         this.init();
+         this.$nextTick( () => {
+            setTimeout( () => (
+                    this.showInfiniteLoading = true
+            ) , 500)
+         })
       },
       methods: {
          // init Method
@@ -264,7 +295,7 @@
             this.loading = false
          },
          // Basic Search Stores
-         searchStores() {
+         searchStores($state) {
             return new Promise((resolve, reject) => {
                this.loading = true
                let city = this.$clone(this.cityOptions.find(city => city.label == this.$route.params.city))
@@ -281,27 +312,32 @@
                         neighborhoods: neighborhood,
                         search: this.$route.params.search
                      },
-                     take: this.paginate.take,
-                     page: this.paginate.page,
+                     take: this.take,
+                     page: this.page,
                   }
                };
                this.$crud.index("apiRoutes.qmarketplace.store", params).then(response => {
-                  this.stores.push(...response.data)
-                  this.loading = false
-                  resolve(true);
-                  this.paginate.maxPages = response.meta.page.lastPage
+                if (response.data.length) {
+                     this.success=true
+                     this.stores.push(...response.data)
+                     this.totalPage = response.meta.page.lastPage
+                     this.page++
+                     this.visible = false;
+                     this.success=true
+                     this.loading = false
+                     $state.loaded();
+                  } else {
+                     $state.complete();
+                   this.loading = false
+                  }
                }).catch(error => {
                   this.loading = false
                   console.error('[ERROR - GET STORES SEARCH] ', error)
-                  this.$alert.error({message: this.$tr('ui.message.errorRequest'), pos: 'bottom'})
+                 // this.$alert.error({message: this.$tr('ui.message.errorRequest'), pos: 'bottom'})
                   reject(error)//Resolve
                })
             })
          },
-		      getMore(){
-            this.paginate.page ++
-            this.searchStores()
-		      },
          // Get Categories Store
          getCategoriesStore() {
             this.loading = true
@@ -408,7 +444,7 @@
 
          },
          // Advanced Search
-         searchAdvanced() {
+         searchAdvanced($state) {
             this.loading = true
             this.loadingBtn = true
 
@@ -443,11 +479,15 @@
             };
 
             this.$crud.index("apiRoutes.qmarketplace.store", params).then(response => {
-               this.stores = response.data
-               if (this.stores.length == 0) {
-                  this.$alert.error({message: 'SIN RESULTADOS', pos: 'bottom'})
+               if (response.data.length) {
+                  this.stores.push(...response.data)
+                  this.totalPage = response.meta.page.lastPage
+                  this.page++
+                  this.visible = false;
+                  $state.loaded();
                } else {
-                  this.drawerPoint = false
+                  $state.complete();
+                  this.$alert.error({message: 'SIN RESULTADOS', pos: 'bottom'})
                }
                this.loading = false
             }).catch(error => {

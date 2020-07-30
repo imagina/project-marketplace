@@ -47,7 +47,7 @@
             <q-card class="topWidgetHomeMobile">
                <q-toolbar>
                   <q-btn flat v-close-popup color="primary" round dense icon="fas fa-arrow-left"/>
-                  <q-toolbar-title class="text-primary font-family-secondary">Encuesta</q-toolbar-title>
+                  <q-toolbar-title class="text-primary font-family-secondary"></q-toolbar-title>
                </q-toolbar>
                <quiz></quiz>
             </q-card>
@@ -74,7 +74,7 @@
             <q-card class="topWidgetHomeMobile">
                <q-toolbar>
                   <q-btn flat v-close-popup color="primary" round dense icon="fas fa-arrow-left"/>
-                  <q-toolbar-title class="text-primary font-family-secondary">Trivia</q-toolbar-title>
+                  <q-toolbar-title class="text-primary font-family-secondary"></q-toolbar-title>
                </q-toolbar>
                <trivia v-if="success" :trivia="trivia" :isModal="false" className="home-trivia"></trivia>
             </q-card>
@@ -96,7 +96,9 @@
          quiz,
          topCompanies,
          topUsers,
-         trivia
+         trivia,
+         quizMobile,
+         triviaMobile
       },
       beforeMount() {
          this.$nextTick(function () {

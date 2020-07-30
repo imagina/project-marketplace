@@ -150,7 +150,7 @@
         .q-item
           display inline-block
           border 0px !important
-
+          background transparent !important
           .q-item-main
             font-size 17px !important
 

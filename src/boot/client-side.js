@@ -5,7 +5,9 @@ import {Chart} from 'highcharts-vue'
 import Lingallery from 'lingallery';
 import SocialSharing from 'vue-social-sharing'
 
+
 export default async ({app, router, store, Vue}) => {
+
 
    //Components
    let components = [

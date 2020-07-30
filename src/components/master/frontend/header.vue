@@ -376,6 +376,7 @@
                padding 20px 10px
                color $secondary
                border-bottom 1px solid #e0e0e0 !important
+               background transparent !important
 
                &:hover
                   background $tertiary!important
@@ -527,4 +528,6 @@
                            right 0
                            background-position center
 
+            .q-item
+               background-color transparent !important
 </style>
