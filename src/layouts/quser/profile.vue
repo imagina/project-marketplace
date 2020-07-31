@@ -37,7 +37,7 @@
 
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 q-mb-lg">
                            <!--Username-->
-                           <q-input v-model="form.fields.userName.value" stack-label :label="`Nombre de Usuario`"/>
+                           <q-input :disable="blockUserNameField" v-model="form.fields.userName.value" stack-label :label="`Nombre de Usuario`"/>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 q-mb-lg">
                            <!--Nickname-->
@@ -437,8 +437,8 @@
                            </div>
 
                            <!-- Friend Name -->
-                           <q-input :disable="blockFriendReferralCode" class="label-mini" v-model="form.fields.friendReferralCode.value"
-                                    label="Escribe el código de referido de tu amigo"/>
+                           <q-input :disable="blockFriendReferralCode" class="label-mini" v-model="form.fields.friendUserName.value"
+                                    label="Escribe el nombre de usuario de tu amigo"/>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 q-mb-lg">
                            <!--Otros -->
@@ -634,6 +634,7 @@
             loading: false,
             success: false,
             blockFriendReferralCode: false,
+            blockUserNameField: false,
             classError: 'nada',
             form: {
                firstName: null,
@@ -823,8 +824,11 @@
             let userData = this.$clone(sessionData.userData)//Get user data
             //Convert fields
             userData.fields = this.$helper.convertToFrontField(this.defaultFields, userData.fields);
-            if(userData.fields.friendReferralCode!=""){
+            if(userData.fields.friendUserName!=undefined && (userData.fields.friendUserName.value!="" && userData.fields.friendUserName.value!=null)){
               this.blockFriendReferralCode=true
+            }
+            if(userData.fields.userName!=undefined && (userData.fields.userName.value!="" && userData.fields.userName.value!=null)){
+              this.blockUserNameField=true
             }
             this.form.id = this.$clone(userData.id)
             this.form.activated = this.$clone(userData.activated)
@@ -882,7 +886,8 @@
                this.updateUserData()//update local userData
             }).catch(error => {
                console.error('[UPDATE PROFILE] ', error)
-               this.$alert.error({message: this.$tr('ui.message.recordNoUpdated')})
+               this.$alert.error({message: error, pos: 'bottom'})
+               // this.$alert.error({message: this.$tr('ui.message.recordNoUpdated')})
                this.loading = false
             })
 
