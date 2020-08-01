@@ -37,7 +37,7 @@
 
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 q-mb-lg">
                            <!--Username-->
-                           <q-input :disable="blockUserNameField" v-model="form.fields.userName.value" stack-label :label="`Nombre de Usuario`"/>
+                           <q-input :disable="blockUserNameField" v-model="form.fields.userName.value" stack-label :label="`Nombre de Usuario (Para referir a amigos)`"/>
                         </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 q-mb-lg">
                            <!--Nickname-->
