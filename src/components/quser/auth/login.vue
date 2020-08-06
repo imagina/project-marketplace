@@ -4,7 +4,7 @@
         <h4 class="text-primary text-center font-family-secondary q-mt-lg q-mb-none">Login</h4>
         <div class="q-body-2 text-center">Bienvenido, tu vaina en el mundo entero</div>
         <hr class="line-grey q-my-md">
-     
+
         <q-form @submit="authenticate()" class="row q-gutter-x-sm q-pt-sm"
             autocorrect="off" autocomplete="off" @validation-error="$alert.error($tr('ui.message.formInvalid'))">
 
@@ -17,7 +17,7 @@
                        >
               </q-input>
             </div>
-    
+
             <!-- Password field -->
             <div :class="columnsFieldsClass">
               <p class="q-subheading q-mb-sm">{{$tr('ui.form.password')}}:</p>
@@ -38,14 +38,16 @@
             <div class="col-12">
               <div class="row">
                 <div class="col-xs-12 col-sm-6 text-center">
-                   <q-btn icon="fab fa-facebook text-blue" flat label="FACEBOOK" />
+                  <facebook-login/>
+                   <!--<q-btn icon="fab fa-facebook text-blue" flat label="FACEBOOK" />-->
                  </div>
                  <div class="col-xs-12 col-sm-6 text-center">
-                   <q-btn icon="fab fa-google text-red-14" flat label="GOOGLE" />
+                   <google-login/>
+                   <!--<q-btn icon="fab fa-google text-red-14" flat label="GOOGLE" />-->
                  </div>
                </div>
             </div>
-          
+
             <!-- Button login -->
             <div class="text-center col-12">
               <q-btn :loading="loading" type="submit" color="primary" class="btn-arrow q-mt-lg font-family-secondary">
@@ -68,19 +70,27 @@
               <q-btn flat label="Volver" class="q-mt-md"
                 @click="emitSelectForm()" color="grey-8"/>
             </div>
-          
-           
+
+
         </q-form>
-        
+
   </div>
 </template>
 
 <script>
+
+import facebookLogin from "src/components/quser/auth/socialAuth/facebook";
+import googleLogin from "src/components/quser/auth/socialAuth/google";
+
   export default {
     props: {
       email: {default: null},
       horizontal: {type: Boolean, default: false},
       selectForm: {type: String, default: 'init'}
+    },
+    components: {
+      facebookLogin,
+      googleLogin
     },
     watch: {
       email() {
@@ -165,7 +175,7 @@
 
   .column-form
     border 1px solid $tertiary
-    
+
   .btn-arrow
     &:after
       content ''
@@ -177,5 +187,5 @@
       top -4px
       left -50px
       position absolute
-      
+
 </style>

@@ -74,7 +74,8 @@
                      order: {
                         field: 'created_at',
                         way: 'desc'
-                     }
+                     },
+                     status:1
                   },
                   take: this.take,
                   page: currentPage
