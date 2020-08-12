@@ -116,6 +116,7 @@
             }
         },
         mounted() {
+          console.log("mounted home");
             if (this.$store.state.quserAuth.userId) {
                 this.getSubscription();
                 // console.error('dsfdsfsdfsdf',this.$store.state.quserAuth.userData.benefits)
@@ -128,7 +129,7 @@
         methods: {
           isToday(dateParameter) {
             var today = new Date();
-            return dateParameter.getDate() === today.getDate() && dateParameter.getMonth() === today.getMonth() && dateParameter.getFullYear() === today.getFullYear();
+            return dateParameter.getDate() === today.getDate() && dateParameter.getMonth() === today.getMonth();
           },
           validateBirthday(){
             let fields=this.$store.state.quserAuth.userData.fields;
