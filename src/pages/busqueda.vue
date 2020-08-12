@@ -1,5 +1,5 @@
 <template>
-   <q-page class="bg-fondo advanced_search form-general relative-position" v-if="success">
+   <q-page class="bg-fondo advanced_search form-general relative-position">
       <!-- Busqueda Avanzada -->
       <div class="q-pa-md bg-white shadow-2 advanced-search-block">
          <div class="q-container q-pt-lg">
@@ -138,17 +138,17 @@
                   </div>
                </div>
                <div slot="no-results">
-                  <div class="row q-pa-lg">
+                  <!--<div class="row q-pa-lg">
                      <div class="col-12">
                         <q-banner inline-actions class="q-mt-xl text-white bg-orange">
                            <template v-slot:avatar>
                               <q-icon name="warning" color="white"/>
                            </template>
-                           No resultados disponibles
+                           No hay resultados disponibles
                         </q-banner>
 
                      </div>
-                  </div>
+                  </div>-->
                </div>
                <div slot="error">
                   Error
@@ -156,30 +156,12 @@
             </infinite-loading>
 
          </div>
-
-         <div v-else>
-
-            <div class="row q-pa-lg">
-               <div class="col-12">
-
-                  <q-banner inline-actions class="q-mt-xl text-white bg-red">
-                     <template v-slot:avatar>
-                        <q-icon name="warning" color="white"/>
-                     </template>
-                     No existen resultados disponibles
-                  </q-banner>
-
-               </div>
-            </div>
-
-         </div>
-         <inner-loading :visible="loading"/>
       </div>
 
       <div class="q-container banner q-py-xl text-center">
          <qbanner systemName="search" height="auto"/>
       </div>
-
+     <inner-loading :visible="loading"/>
    </q-page>
 </template>
 <script>
@@ -245,8 +227,6 @@
             totalPage: 0,
             take: 16,
             lastPage: 1,
-
-
             loading: true,
             success: false,
             typeSearch: 1, // 1 = Front Header, 2 = Advance Search
@@ -260,12 +240,15 @@
       watch: {
          '$route.params.search': {
             handler: function (search) {
+              this.loading = true
+              this.page=1
                this.init();
             },
             deep: true,
             immediate: true
          },
          drawerPoint(val) {
+           this.loading = true
             if (this.firstAdvanced == false) {
                this.firstAdvanced = true
                this.getInforAdvanced()
@@ -278,6 +261,7 @@
       },
       mounted() {
          this.$nextTick( () => {
+           this.loading = true
             setTimeout( () => (
                     this.showInfiniteLoading = true
             ) , 500)
@@ -288,6 +272,7 @@
          async init() {
             this.loading = true
             this.success=false
+            this.stores=[]
             await this.getCities()
             await this.getNeighborhoods()
             await this.searchStores()

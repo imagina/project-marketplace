@@ -107,7 +107,7 @@ if (workbox) {
         );
       }
   });
-    let click_open_url
+ /*   let click_open_url
     self.addEventListener('push', function(event) {
         let push_message = event.data.msj
         // push notification can send event.data.json() as well
@@ -119,13 +119,14 @@ if (workbox) {
             tag: 'alert'
         };
         event.waitUntil(self.registration.showNotification(push_message.notification.title, options));
-    });
+    });*/
 
     self.addEventListener('notificationclick', function(event) {
         const clickedNotification = event.notification;
         clickedNotification.close();
-        if ( click_open_url ){
-            const promiseChain = clients.openWindow(click_open_url);
+        console.warn('dsdsdsd',clickedNotification )
+        if (clickedNotification.data) {
+            const promiseChain = clients.openWindow(clickedNotification.data);
             event.waitUntil(promiseChain);
         }
     });
