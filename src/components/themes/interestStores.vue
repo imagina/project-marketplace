@@ -44,14 +44,40 @@
            }else{
              userCategories=[1,2,3]
            }
+           let params={
+              filter: {
+                 // categories: userCategories,
+                 order: 'random'
+              },
+              take: 6
+           };
+           var searchStore = localStorage.getItem("searchStore");
+           var searchCity = localStorage.getItem("searchCity");
+           var searchNeighborhood = localStorage.getItem("searchNeighborhood");
+           if(searchStore){
+             params.filter.search=searchStore;
+           }
+           // if(searchCity){
+           //   params.filter.cities=searchCity;
+           // }else{
+           //   params.filter.cities=null;
+           // }
+           // if(searchNeighborhood!=undefined && searchNeighborhood!="0" && searchNeighborhood){
+           //   params.filter.neighborhoods=searchNeighborhood;
+           // }else{
+           //   params.filter.neighborhoods=null;
+           //
+           // }
+
+           if(!searchStore){
+             params.filter.categories=userCategories;
+           }else{
+             params.filter.categories=null;
+
+           }
+
             this.$crud.index("apiRoutes.qmarketplace.store", {
-               params: {
-                  filter: {
-                     categories: userCategories,
-                     order: 'random'
-                  },
-                  take: 6
-               }
+               params: params
             }).then(response => {
                this.stores = response.data;
               this.loading = false

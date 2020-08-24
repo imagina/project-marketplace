@@ -186,7 +186,12 @@
                  neighborhood = this.search.neighborhood.label
                }
 
-               console.warn('PARMETROS DE BUSQUEDA', this.search.text, city, neighborhood)
+               localStorage.setItem("searchStore", this.search.text);
+               localStorage.setItem("searchCity", city);
+               localStorage.setItem("searchNeighborhood", neighborhood);
+               /*
+                console.warn('PARMETROS DE BUSQUEDA', this.search.text, city, neighborhood)
+               */
               this.$router.push({
                   name: 'app.busqueda',
                 params: {
