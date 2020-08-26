@@ -186,7 +186,25 @@
                  neighborhood = this.search.neighborhood.label
                }
 
-               localStorage.setItem("searchStore", this.search.text);
+               var searchStore = localStorage.getItem("searchStore");
+               if(searchStore){
+                if(searchStore.includes("[")){
+                  searchStore=JSON.parse(searchStore);
+                }
+                else{
+                  searchStore=[searchStore];
+                }
+                if(!searchStore.includes(this.search.text)){
+                  searchStore.push(this.search.text);
+                  if(searchStore.length>3){
+                    searchStore.splice(0,1);
+                  }
+                localStorage.setItem("searchStore", JSON.stringify(searchStore));
+                }
+               }else{
+                localStorage.setItem("searchStore", JSON.stringify(this.search.text));
+               }
+
                localStorage.setItem("searchCity", city);
                localStorage.setItem("searchNeighborhood", neighborhood);
                /*

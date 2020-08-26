@@ -55,7 +55,16 @@
            var searchCity = localStorage.getItem("searchCity");
            var searchNeighborhood = localStorage.getItem("searchNeighborhood");
            if(searchStore){
-             params.filter.search=searchStore;
+            if(searchStore.includes("[")){
+              searchStore=JSON.parse(searchStore);
+            }else{
+              searchStore=[searchStore];
+            }
+            var searchText="";
+            for(var i=0;i<searchStore.length;i++){
+              searchText+=" "+searchStore[i];
+            }
+            params.filter.search=searchText;
            }
            // if(searchCity){
            //   params.filter.cities=searchCity;
@@ -75,7 +84,7 @@
              params.filter.categories=null;
 
            }
-
+           console.log(params);
             this.$crud.index("apiRoutes.qmarketplace.store", {
                params: params
             }).then(response => {
